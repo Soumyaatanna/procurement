@@ -1,4 +1,5 @@
 import { ai, withRetry, FALLBACK_MODEL, Type } from "./BaseAgent";
+import { briefingCache, feedCache, translationCache, entityCache, getCacheKey } from "../utils/cache";
 
 export const generateBriefingStream = async (
   persona: string, 
@@ -6,6 +7,16 @@ export const generateBriefingStream = async (
   onChunk: (chunk: string) => void,
   onSources?: (sources: { title: string, url: string }[]) => void
 ) => {
+  const cacheKey = getCacheKey('briefing', persona, topic);
+  
+  // Check cache first
+  const cachedBriefing = briefingCache.get(cacheKey);
+  if (cachedBriefing) {
+    console.log('Using cached briefing for:', topic);
+    onChunk(cachedBriefing);
+    return;
+  }
+
   const isUrl = topic.trim().startsWith('http://') || topic.trim().startsWith('https://');
   
   const systemInstruction = `You are a world-class business intelligence analyst. 
@@ -26,6 +37,7 @@ export const generateBriefingStream = async (
     config.tools = [{ googleSearch: {} }];
   }
 
+  let fullText = '';
   const response = await withRetry((model) => ai.models.generateContentStream({
     model,
     contents: isUrl 
@@ -36,6 +48,7 @@ export const generateBriefingStream = async (
 
   for await (const chunk of response) {
     if (chunk.text) {
+      fullText += chunk.text;
       onChunk(chunk.text);
     }
     
@@ -52,9 +65,21 @@ export const generateBriefingStream = async (
       }
     }
   }
+
+  // Cache the full briefing after it's generated
+  briefingCache.set(cacheKey, fullText);
 };
 
 export const generatePersonalizedFeed = async (persona: string, interests: string[]) => {
+  const cacheKey = getCacheKey('feed', persona, ...interests);
+  
+  // Check cache first
+  const cachedFeed = feedCache.get(cacheKey);
+  if (cachedFeed) {
+    console.log('Using cached feed for:', persona);
+    return cachedFeed;
+  }
+
   const prompt = `Generate 3 important business news headlines and short summaries (2 sentences each) for a ${persona} interested in: ${interests.join(', ')}. 
   Format as a JSON array of strings, where each string is "Headline: Summary".`;
   
@@ -64,20 +89,42 @@ export const generatePersonalizedFeed = async (persona: string, interests: strin
     config: { responseMimeType: "application/json" },
   }));
 
-  return JSON.parse(response.text);
+  const result = JSON.parse(response.text);
+  feedCache.set(cacheKey, result);
+  return result;
 };
 
 export const translateNews = async (text: string, targetLanguage: string) => {
+  const cacheKey = getCacheKey('translation', targetLanguage, text.substring(0, 50));
+  
+  // Check cache first
+  const cachedTranslation = translationCache.get(cacheKey);
+  if (cachedTranslation) {
+    console.log('Using cached translation for:', targetLanguage);
+    return cachedTranslation;
+  }
+
   const response = await withRetry((model) => ai.models.generateContent({
     model: FALLBACK_MODEL,
     contents: `Translate the following business news into ${targetLanguage}. 
     Provide a culturally adapted explanation with local context, not just a literal translation: ${text}`,
   }));
 
-  return response.text;
+  const result = response.text;
+  translationCache.set(cacheKey, result);
+  return result;
 };
 
 export const getEntityDetails = async (entity: string) => {
+  const cacheKey = getCacheKey('entity', entity);
+  
+  // Check cache first
+  const cachedEntity = entityCache.get(cacheKey);
+  if (cachedEntity) {
+    console.log('Using cached entity details for:', entity);
+    return cachedEntity;
+  }
+
   const response = await withRetry((model) => ai.models.generateContent({
     model: FALLBACK_MODEL,
     contents: `Provide a concise, high-level business summary of "${entity}". 
@@ -88,11 +135,13 @@ export const getEntityDetails = async (entity: string) => {
     },
   }));
 
-  return {
+  const result = {
     text: response.text,
     sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks?.map((chunk: any) => ({
       title: chunk.web?.title,
       url: chunk.web?.uri
     })).filter((s: any) => s.title && s.url) || []
   };
+  entityCache.set(cacheKey, result);
+  return result;
 };

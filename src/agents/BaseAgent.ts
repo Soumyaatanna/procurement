@@ -1,6 +1,28 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 
-const apiKey = "AIzaSyAcfkehOY9VL0BBFpRbkwHmpDSNj82ku6U";
+// Robust API key detection for both local and cloud environments
+const getApiKey = () => {
+  // 1. Check for standard GEMINI_API_KEY (usually injected by Vite define)
+  if (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) {
+    return process.env.GEMINI_API_KEY;
+  }
+
+  // 2. Check for VITE_ prefixed key (standard Vite way for local .env)
+  const viteKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
+  if (viteKey) {
+    return viteKey;
+  }
+
+  // 3. Fallback to any other potential environment variable
+  return "";
+};
+
+const apiKey = getApiKey();
+
+if (!apiKey) {
+  console.warn("WARNING: GEMINI_API_KEY is missing. Please ensure it is set in your .env file as GEMINI_API_KEY or VITE_GEMINI_API_KEY.");
+}
+
 export const ai = new GoogleGenAI({ apiKey });
 
 export const PRIMARY_MODEL = "gemini-3.1-pro-preview";

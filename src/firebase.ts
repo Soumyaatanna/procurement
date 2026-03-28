@@ -9,17 +9,28 @@ import {
 } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC8DDpp7rD4o4SieqWS9Po81T42XDtWygw",
-  authDomain: "aura-9151f.firebaseapp.com",
-  projectId: "aura-9151f",
-  storageBucket: "aura-9151f.firebasestorage.app",
-  messagingSenderId: "456299596747",
-  appId: "1:456299596747:web:f065ab5a437e6a4b11c44e",
-  measurementId: "G-9T5WMERZQ3"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
-export const analytics = getAnalytics(app);
+
+// Initialize analytics only if projectId is available
+let analytics: ReturnType<typeof getAnalytics> | null = null;
+try {
+  if (firebaseConfig.projectId) {
+    analytics = getAnalytics(app);
+  }
+} catch (error) {
+  console.warn('Analytics initialization failed:', error);
+}
+
+export { analytics };
 
 // Use initializeFirestore with experimentalForceLongPolling for better local reliability
 export const db = initializeFirestore(app, {
