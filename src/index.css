@@ -4,23 +4,57 @@
   --dark-mode: class;
 }
 
-/* Global color overrides for card surfaces */
+/* Global dark + orange palette */
 body {
-  background-color: #fff;
-  color: #000;
+  background-color: #05060a;
+  color: #f3f2ef;
+  font-smooth: antialiased;
 }
 
-/* Force all Tailwind text utilities to render black text */
-[class*="text-"] {
-  color: #000 !important;
+/* Default surface + text overrides to keep UI dark */
+[class*="bg-white"],
+[class*="bg-gray-50"],
+[class*="bg-gray-100"],
+[class*="bg-slate"],
+[class*="bg-neutral-1"] {
+  background-color: #0e1018 !important;
 }
 
-/* Standardize every border to pure black */
-[class*="border"] {
-  border-color: #000 !important;
+[class*="text-gray-900"],
+[class*="text-gray-800"],
+[class*="text-gray-700"] {
+  color: #f3f2ef !important;
 }
 
-/* Any bordered surface should stay white like a card */
-[class*="border"][class*="bg-"] {
-  background-color: #fff !important;
+[class*="text-gray-600"],
+[class*="text-gray-500"] {
+  color: #c9ceda !important;
+}
+
+/* Border + divider tone */
+[class*="border"],
+hr {
+  border-color: #1e2233 !important;
+}
+
+/* Orange highlight for interactive elements */
+a,
+button,
+[role="button"],
+.hover-accent {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+a:hover,
+button:hover,
+[role="button"]:hover,
+.hover-accent:hover {
+  color: #ff8c32 !important;
+  border-color: #ff8c32 !important;
+  background-color: rgba(255, 140, 50, 0.08) !important;
+}
+
+/* Accent text utility */
+.text-orange-glow {
+  color: #ff8c32 !important;
 }
