@@ -69,8 +69,10 @@ import {
 import { generateStoryArc } from './agents/StoryArcAgent';
 import { generateStorySegment } from './agents/StoryModeAgent';
 import { generateImage } from './agents/ImageGenerationAgent';
+import { generateAndCacheImage, getDefaultImage } from './utils/imageGenerationUtils';
 import { chatWithNews } from './agents/NewsChatAgent';
 import { generateSpeech, generatePodcastScript, generateMultiSpeakerPodcast } from './agents/VoiceAgent';
+import { speakText } from './utils/textToSpeechUtils';
 
 // --- Types ---
 type Persona = 'investor' | 'founder' | 'student';
@@ -387,7 +389,7 @@ export default function App() {
     setArticleImage(null);
     try {
       // Generate image in parallel with briefing stream
-      generateImage(title.trim()).then(url => setArticleImage(url));
+      generateAndCacheImage(title.trim()).then(url => setArticleImage(url || getDefaultImage(title)));
       
       let fullContent = '';
       await generateBriefingStream(
@@ -439,7 +441,7 @@ export default function App() {
     setBriefingSources([]);
     try {
       // Generate image in parallel
-      generateImage(briefingTopic).then(url => setBriefingImage(url));
+      generateAndCacheImage(briefingTopic).then(url => setBriefingImage(url || getDefaultImage(briefingTopic)));
 
       let fullContent = '';
       await generateBriefingStream(
@@ -530,8 +532,8 @@ export default function App() {
     
     try {
       const result = await generateStorySegment(profile.persona, topic);
-      const imageUrl = await generateImage(result.imagePrompt);
-      setCurrentStory({ ...result, imageUrl: imageUrl || undefined });
+      const imageUrl = await generateAndCacheImage(result.imagePrompt || topic);
+      setCurrentStory({ ...result, imageUrl: imageUrl || getDefaultImage(result.imagePrompt || topic) });
     } catch (e) {
       console.error(e);
     } finally {
@@ -543,7 +545,7 @@ export default function App() {
     if (!currentStory?.imagePrompt) return;
     setIsRegeneratingImage(true);
     try {
-      const imageUrl = await generateImage(currentStory.imagePrompt);
+      const imageUrl = await generateAndCacheImage(currentStory.imagePrompt || storyTopic);
       if (imageUrl) {
         setCurrentStory(prev => prev ? { ...prev, imageUrl } : null);
       }
@@ -562,9 +564,12 @@ export default function App() {
     }
 
     if (activeAudioId === id && !isPlaying) {
-      audio?.play();
-      setIsPlaying(true);
-      return;
+      if (audio) {
+        audio.play();
+        setIsPlaying(true);
+        return;
+      }
+      // If audio is null but we're trying to resume, request TTS again
     }
 
     // Stop current audio if any
@@ -575,22 +580,46 @@ export default function App() {
     setIsGeneratingSpeech(true);
     setActiveAudioId(id);
     try {
-      const base64 = await generateSpeech(text);
-      if (base64) {
-        const url = `data:audio/mp3;base64,${base64}`;
-        const newAudio = new Audio(url);
-        newAudio.onended = () => {
-          setIsPlaying(false);
-          setActiveAudioId(null);
-        };
-        setAudio(newAudio);
-        newAudio.play();
-        setIsPlaying(true);
+      const audioUrl = await generateSpeech(text);
+      if (audioUrl) {
+        // Handle Web Speech API format
+        if (audioUrl.startsWith('ws-api:///')) {
+          const decodedText = decodeURIComponent(audioUrl.replace('ws-api:///', ''));
+          setIsPlaying(true);
+          try {
+            await speakText(decodedText);
+          } finally {
+            setIsPlaying(false);
+            setActiveAudioId(null);
+          }
+        } else {
+          // Handle regular audio data URL or blob URL
+          const newAudio = new Audio(audioUrl);
+          newAudio.onerror = (e) => {
+            console.error('Audio error:', e);
+            setIsPlaying(false);
+            setActiveAudioId(null);
+          };
+          newAudio.onended = () => {
+            setIsPlaying(false);
+            setActiveAudioId(null);
+          };
+          setAudio(newAudio);
+          newAudio.play().catch(err => {
+            console.error('Playback failed:', err);
+            setIsGeneratingSpeech(false);
+          });
+          setIsPlaying(true);
+        }
+      } else {
+        console.warn('Audio generation returned null');
+        setIsGeneratingSpeech(false);
+        setActiveAudioId(null);
       }
     } catch (e) {
-      console.error(e);
-    } finally {
+      console.error('Speech generation error:', e);
       setIsGeneratingSpeech(false);
+      setActiveAudioId(null);
     }
   };
 
@@ -599,23 +628,45 @@ export default function App() {
     setIsGeneratingPodcast(true);
     setPodcastAudio(null);
     try {
+      console.log('📝 Generating podcast script...');
       const script = await generatePodcastScript(profile.interests, profile.persona, podcastTopic || undefined);
-      const base64 = await generateMultiSpeakerPodcast(script);
-      if (base64) {
-        setPodcastAudio(`data:audio/mp3;base64,${base64}`);
+      
+      console.log('🎙️  Generating podcast audio...');
+      const audioUrl = await generateMultiSpeakerPodcast(script);
+      
+      if (audioUrl) {
+        console.log('✅ Podcast audio generated successfully');
+        // Podcast audio is already in the correct format (data URL or ws-api://)
+        setPodcastAudio(audioUrl);
+      } else {
+        console.warn('⚠️  Podcast audio generation failed, using mock fallback');
+        // Fallback: Keep audio as null and show message to user
+        setPodcastAudio(null);
       }
     } catch (e) {
-      console.error(e);
+      console.error('❌ Podcast generation error:', e);
+      setPodcastAudio(null);
     } finally {
       setIsGeneratingPodcast(false);
     }
   };
 
-  const AudioPlayer = ({ src }: { src: string }) => {
+  const AudioPlayer = ({ src }: { src: string | null }) => {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [error, setError] = useState<string | null>(null);
+    const [useWebSpeech, setUseWebSpeech] = useState(false);
+
+    // Check if this is a Web Speech API URL
+    useEffect(() => {
+      if (src?.startsWith('ws-api:///')) {
+        setUseWebSpeech(true);
+      } else {
+        setUseWebSpeech(false);
+      }
+    }, [src]);
 
     useEffect(() => {
       const audio = audioRef.current;
@@ -624,26 +675,64 @@ export default function App() {
       const updateTime = () => setCurrentTime(audio.currentTime);
       const updateDuration = () => setDuration(audio.duration);
       const handleEnded = () => setIsPlaying(false);
+      const handleError = () => {
+        console.error('Audio element error');
+        setError('Failed to load audio');
+      };
 
       audio.addEventListener('timeupdate', updateTime);
       audio.addEventListener('loadedmetadata', updateDuration);
       audio.addEventListener('ended', handleEnded);
+      audio.addEventListener('error', handleError);
 
       return () => {
         audio.removeEventListener('timeupdate', updateTime);
         audio.removeEventListener('loadedmetadata', updateDuration);
         audio.removeEventListener('ended', handleEnded);
+        audio.removeEventListener('error', handleError);
       };
     }, []);
 
-    const togglePlay = () => {
-      if (audioRef.current) {
-        if (isPlaying) {
-          audioRef.current.pause();
-        } else {
-          audioRef.current.play();
+    const togglePlay = async () => {
+      if (!src) {
+        setError('No audio available');
+        return;
+      }
+
+      if (useWebSpeech) {
+        // Use Web Speech API
+        const text = decodeURIComponent(src.replace('ws-api:///', ''));
+        try {
+          setIsPlaying(true);
+          await speakText(text);
+          setIsPlaying(false);
+        } catch (e) {
+          console.error('Web Speech API failed:', e);
+          setError('Audio playback not available');
+          setIsPlaying(false);
         }
-        setIsPlaying(!isPlaying);
+      } else {
+        // Use regular audio element
+        if (audioRef.current) {
+          try {
+            if (isPlaying) {
+              audioRef.current.pause();
+            } else {
+              // Wait for audio to be loadable
+              const promise = audioRef.current.play();
+              if (promise !== undefined) {
+                promise.catch((err) => {
+                  console.error('Audio play error:', err);
+                  setError('Failed to play audio');
+                });
+              }
+            }
+            setIsPlaying(!isPlaying);
+          } catch (e) {
+            console.error('Playback error:', e);
+            setError('Failed to play audio');
+          }
+        }
       }
     };
 
@@ -661,9 +750,18 @@ export default function App() {
       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
+    if (!src) {
+      return (
+        <div className="w-full bg-gray-50 dark:bg-white/5 p-4 rounded-2xl text-center text-sm text-gray-400 dark:text-gray-500">
+          ⚠️ Audio generation currently unavailable. Please try again.
+        </div>
+      );
+    }
+
     return (
       <div className="w-full bg-gray-50 dark:bg-white/5 p-6 rounded-2xl space-y-4">
-        <audio ref={audioRef} src={src} />
+        {!useWebSpeech && <audio ref={audioRef} src={src} />}
+        {error && <div className="text-xs text-red-500 font-semibold">{error}</div>}
         <div className="flex items-center gap-4">
           <button 
             onClick={togglePlay}
@@ -672,18 +770,26 @@ export default function App() {
             {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
           </button>
           <div className="flex-1 space-y-1">
-            <input 
-              type="range" 
-              min="0" 
-              max={duration || 0} 
-              value={currentTime} 
-              onChange={handleSeek}
-              className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
-            />
-            <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
+            {useWebSpeech ? (
+              <div className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">
+                🎤 Browser Voice (No Audio File)
+              </div>
+            ) : (
+              <>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max={duration || 0} 
+                  value={currentTime} 
+                  onChange={handleSeek}
+                  className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                />
+                <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -1149,9 +1255,9 @@ export default function App() {
                         <h3 className="text-xl font-bold mb-8 flex items-center gap-2 dark:text-white">
                           <TrendingUp className="w-5 h-5 text-orange-500" /> Sentiment Timeline
                         </h3>
-                        <div className="h-[300px] w-full">
+                        <div style={{ height: '300px', width: '100%' }}>
                           {storyArc.timeline && storyArc.timeline.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                               <AreaChart data={storyArc.timeline}>
                                 <defs>
                                   <linearGradient id="colorSentiment" x1="0" y1="0" x2="0" y2="1">
@@ -1184,9 +1290,9 @@ export default function App() {
                         <h3 className="text-xl font-bold mb-8 flex items-center gap-2 dark:text-white">
                           <TrendingUp className="w-5 h-5 text-blue-500" /> Stock Price / Valuation
                         </h3>
-                        <div className="h-[300px] w-full">
+                        <div style={{ height: '300px', width: '100%' }}>
                           {storyArc.timeline && storyArc.timeline.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
                               <LineChart data={storyArc.timeline}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme === 'dark' ? '#1f2937' : '#f3f4f6'} />
                                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />

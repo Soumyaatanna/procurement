@@ -27,120 +27,134 @@ export interface MockEntity {
 // Realistic mock business briefings
 const mockBriefings: Record<string, MockBriefing> = {
   'technology-ai': {
-    content: `# Artificial Intelligence Market Insights
+    content: `# Geopolitical Impact on Global Markets - 2026 Crisis
 
 ## Executive Summary
-The AI market continues explosive growth with enterprise adoption accelerating.
+The Iran-Iraq conflict escalation is reshaping global markets with immediate impacts on energy prices, semiconductor supply chains, and defense technology investments.
 
-## Key Trends
-- **Generative AI Integration**: Companies integrating AI into core business processes
-- **Enterprise Spending**: B2B AI spending increased 35% YoY
-- **Regulatory Environment**: New AI governance frameworks emerging globally
-- **Talent Competition**: AI talent commanding premium salaries (40-50% above market)
+## Critical Market Impacts
+- **Oil Prices**: Brent crude up 35% to $88/barrel amid supply concerns
+- **Shipping Routes**: Strait of Hormuz risks creating 15% premium on energy
+- **Tech Supply Chains**: Middle East disruptions affecting semiconductor components
+- **Defense Spending**: Global defense budgets increased 12% YoY
+
+## Key Business Trends
+- **Energy Security**: Renewed focus on alternative energy sources
+- **Cybersecurity**: Critical infrastructure protection investments surging
+- **Supply Chain**: Regional diversification away from Middle East dependencies
+- **Risk Management**: Enterprise AI adoption for geopolitical scenario monitoring
 
 ## Market Opportunities
-1. AI infrastructure and cloud services
-2. Industry-specific AI solutions
-3. AI safety and compliance tools
-4. AI talent and training services
+1. Cyber defense and critical infrastructure protection
+2. Alternative energy and renewable transition acceleration
+3. Regional supply chain mapping and AI analytics
+4. Defense technology modernization
+5. Supply chain resilience software
 
 ## Risk Factors
-- Regulatory uncertainty in key markets
-- Talent shortage driving up costs
-- Competition from open-source alternatives
-- Economic slowdown impact on enterprise spending
+- Geopolitical escalation uncertainty
+- Energy volatility impacting global trade
+- Potential sanctions disrupting supply chains
+- Insurance and logistics cost increases
+- Currency fluctuations in affected regions
 
-## Recommendations
-- Monitor regulatory developments in US, EU, and Asia
-- Evaluate AI vendors for compliance and security
-- Plan for talent retention and training
-- Consider hybrid in-house and cloud AI strategies`,
-    imageUrl: 'https://images.unsplash.com/photo-1677442d019cecf8730f17a10a3de47b5affd70d?w=800&h=500&fit=crop',
+## Strategic Recommendations
+- Diversify energy sourcing and re-examine supply chain concentration
+- Increase cybersecurity investments for critical systems
+- Monitor geopolitical risk indicators continuously
+- Evaluate impact on sectors with Middle East exposure`,
+    imageUrl: 'https://images.unsplash.com/photo-1667372335033-c42b63f543f4?w=800&h=500&fit=crop',
     sources: [
-      { title: 'TechCrunch - AI Investment Trends 2024', url: '#' },
-      { title: 'McKinsey - AI Capstone Report', url: '#' },
-      { title: 'Gartner - AI Market Analysis', url: '#' },
+      { title: 'Reuters - Middle East Conflict Analysis', url: '#' },
+      { title: 'Bloomberg - Energy Market Reports', url: '#' },
+      { title: 'Goldman Sachs - Geopolitical Risk Assessment', url: '#' },
     ],
   },
   'finance-markets': {
-    content: `# Finance Markets Overview
+    content: `# Global Markets Crisis Report - Iran-Iraq Conflict 2026
 
-## Market Performance
-Global equity markets show mixed signals with divergent regional trends.
+## Market Performance Overview
+Global markets experiencing volatility due to Middle East tensions. Safe-haven assets gaining while emerging markets facing headwinds.
 
 ## Key Market Moves
-- **US Markets**: S&P 500 up 12% YTD on AI enthusiasm
-- **Tech Sector**: Leading gains driven by AI chip manufacturers
-- **Interest Rates**: Fed on Hold, futures show stability
-- **Emerging Markets**: Growing opportunities in Asia-Pacific
+- **Oil Markets**: WTI crude up 32%, driving energy stock rallies
+- **Gold**: Safe-haven asset up 8% as investors seek stability
+- **Emerging Markets**: Currencies weaker against USD; flight to safety
+- **Defense Stocks**: Up 18% on increased government spending
+- **Tech**: Down 6% due to semiconductor supply chain concerns
 
-## Economic Indicators
-1. Inflation moderating to 3.2% (down from 5.4%)
-2. Unemployment at historic lows (3.7%)
-3. Business confidence index up 15%
-4. Consumer spending resilient
+## Economic Impacts
+1. **Inflation Pressure**: Energy costs rising 4-6% across developed economies
+2. **Central Banks**: Reassessing rate policies amid economic uncertainty
+3. **Insurance Costs**: Maritime and aviation premiums up 25-30%
+4. **Trading Volumes**: Volatility index (VIX) at 28, elevated from 15
 
-## Investment Themes
-- AI and automation leaders
-- Renewable energy transition
-- Healthcare innovation
-- Financial technology
+## Critical Sectors Under Pressure
+- **Shipping & Logistics**: Supply chain delays increasing costs
+- **Airlines**: Fuel surcharges and route diversions impacting margins
+- **Manufacturing**: Raw material costs up 15-20%
+- **Insurance**: Premium spikes for Middle East exposure
 
-## Watch List
-- Semiconductor supply chain
-- Commercial real estate valuations
-- Bank lending standards
-- Energy market volatility
+## Investment Thesis
+Long-term positioning: diversification, hedging strategies, focus on resilient companies with strong balance sheets and minimal Middle East exposure.
 
-## Strategic Actions
-Monitor portfolio positioning for potential rate cuts in Q4 2024.`,
+## Watch Carefully
+- Strait of Hormuz shipping incidents
+- Oil production disruptions
+- Sanction implementations
+- Currency movements in affected regions`,
     imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=500&fit=crop',
     sources: [
-      { title: 'Bloomberg - Market Analysis', url: '#' },
-      { title: 'Financial Times - Weekly Update', url: '#' },
-      { title: 'Reuters - Economic Calendar', url: '#' },
+      { title: 'Financial Times - Crisis Coverage', url: '#' },
+      { title: 'JP Morgan - Market Analysis', url: '#' },
+      { title: 'CNBC - Breaking News', url: '#' },
     ],
   },
   'startup-ecosystem': {
-    content: `# Startup Ecosystem Report
+    content: `# 2026 Startup Landscape - Geopolitical Crisis Impact
 
-## Funding Environment
-Startup funding recovering with focus on profitable growth.
+## Funding Environment Shift
+The Iran-Iraq conflict has created both challenges and opportunities for startups. Risk-aware investors are reallocating capital toward resilience-focused companies.
 
-## Funding Metrics
-- **Total Raised**: $32B in Q1 2024 (up 22% QoQ)
-- **Average Series A**: $8.5M (stable)
-- **Median Runway**: 18 months (healthier than 2022)
-- **Success Rate**: Improved as founders focus on unit economics
+## Sector Opportunities Emerging
+**Growing Funding Areas:**
+1. **Cybersecurity & Defense Tech**: $2.4B invested in Q1 2026
+2. **Supply Chain AI**: Companies mapping alternatives attracting $1.8B
+3. **Energy Tech & Renewables**: Accelerated investment in energy independence
+4. **Logistics & Shipping Tech**: Rerouting solutions commanding premiums
+5. **Geopolitical Risk Analytics**: New category attracting enterprise spending
 
-## Hot Sectors
-1. **AI Infrastructure**: Generative AI tooling and platforms
-2. **Climate Tech**: Carbon capture and monitoring
-3. **Biotech**: Precision medicine and drug discovery
-4. **Fintech**: Embedded finance and SMB banking
+## Funding Trends
+- **Total Q1 2026**: $28B raised (down 12% due to risk re-assessment)
+- **Series B Preferred**: Investors backing companies with proven revenue
+- **Geographic Shift**: Reduced focus on MENA region, increased US/EU
+- **Risk Premium**: Companies with Middle East exposure facing 20-30% valuation cuts
 
-## Investor Trends
-- Focus on profitability over growth
-- Increased due diligence on unit economics
-- More founder-friendly valuations
-- Geographic diversification beyond SF/NYC
+## Startup Challenges
+- Reduced risk appetite from investors
+- Supply chain partners becoming unreliable
+- Insurance and logistics costs surging
+- Travel restrictions affecting international teams
+- Uncertainty deterring venture capital
 
-## Challenges
-- Market selectivity (best companies thriving)
-- Slower exit environment
-- Increased competition for talent
-- Higher customer acquisition costs
+## New Opportunities
+- Companies solving supply chain resilience
+- Geopolitical risk monitoring platforms
+- Cyber defense solutions
+- Energy independence technology
+- Alternative logistics networks
 
-## Opportunities for Entrepreneurs
-- Raising is still possible for strong teams with market traction
-- Customer-centric business models preferred
-- International expansion opportunities
-- Open positions for experienced operators`,
+## Strategic Advice for Founders
+- Focus on sectors benefiting from geopolitical shift
+- Emphasize supply chain resilience
+- Build defensible moats with government contracts
+- Consider geographic diversification
+- Pivot to energy security if applicable`,
     imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=500&fit=crop',
     sources: [
-      { title: 'Crunchbase - Startup Database', url: '#' },
-      { title: 'PitchBook - Market Report', url: '#' },
-      { title: 'VentureXpert - Analytics', url: '#' },
+      { title: 'Crunchbase - Q1 2026 Report', url: '#' },
+      { title: 'PitchBook - Funding Trends Analysis', url: '#' },
+      { title: 'VentureXpert - Geopolitical Impact Study', url: '#' },
     ],
   },
 };
@@ -149,52 +163,52 @@ Startup funding recovering with focus on profitable growth.
 const mockFeeds: Record<string, MockFeedItem[]> = {
   'executive': [
     {
-      headline: 'AI Drives Enterprise Software Spending to Record Highs',
-      summary: 'Enterprise software budgets exceed $500B annually with AI tooling accounting for 23% growth. Companies prioritizing implementation over experimentation.',
+      headline: 'Oil Markets Rally on Middle East Uncertainty',
+      summary: 'Brent crude jumps 35% to $88/barrel. Energy companies benefiting from supply concerns. Investors warned of further volatility ahead.',
       imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=300&fit=crop',
     },
     {
-      headline: 'Global Supply Chain Stabilization Boosts Margins',
-      summary: 'Manufacturing lead times return to pre-pandemic levels. Inventory normalization expected to improve corporate profitability in H2 2024.',
+      headline: 'Supply Chain Crisis: Companies Rush to Diversify',
+      summary: 'Manufacturers accelerating shift away from Middle East component suppliers. Supply chain redesign costs exceeding $2B across Fortune 500.',
       imageUrl: 'https://images.unsplash.com/photo-1586282391129-76a47df1d6b3?w=400&h=300&fit=crop',
     },
     {
-      headline: 'Cybersecurity Budget Allocations Shift to AI-Driven Defense',
-      summary: 'Zero-trust architecture adoption accelerates. Security spending expected to grow 12% annually through 2026 as breaches increase.',
+      headline: 'Defense Spending Surge as Nations Strengthen Military Capacity',
+      summary: 'Global defense budgets up 12% for 2026. Cyber warfare capabilities and missile defense garnering largest allocations.',
       imageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=400&h=300&fit=crop',
     },
   ],
   'investor': [
     {
-      headline: 'Venture Capital Returns to Profitability Focus',
-      summary: 'VCs shifting portfolio strategy to companies with clear paths to profitability. Average Series A valuation down 15% from 2021 peaks.',
+      headline: 'Safe-Haven Assets Rally: Gold Up 8%, Dollar Strengthens',
+      summary: 'Risk-off sentiment sending investors to traditional safe havens. Emerging market currencies weakening as capital flows to US and Europe.',
       imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=300&fit=crop',
     },
     {
-      headline: 'Tech IPO Market Revives with Strong Demand',
-      summary: 'First tech IPOs of 2024 show strong institutional demand. Market expected to see 40-50 IPOs by year-end.',
+      headline: 'Geopolitical Risk Premiums Reshape Portfolio Returns',
+      summary: 'Energy stocks +18%, Defense +16%. Tech stocks down 6% on supply chain concerns. Flight to quality dominates market dynamics.',
       imageUrl: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=300&fit=crop',
     },
     {
-      headline: 'Cross-Border Acquisitions Accelerate in Asia',
-      summary: 'M&A activity up 28% in APAC region. Tech and healthcare drivers of consolidation wave.',
+      headline: 'Shipping Insurance Premiums Spike 25% as Strait of Hormuz Becomes Critical',
+      summary: 'Maritime insurance costs surge amid re-routing concerns. Red Sea and Suez alternatives creating bottlenecks. Shipping indexes at 5-year highs.',
       imageUrl: 'https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=300&fit=crop',
     },
   ],
   'developer': [
     {
-      headline: 'Open Source AI Models Challenge Commercial Vendors',
-      summary: 'Community-driven models achieving 95% parity with commercial offerings. Cost savings driving enterprise adoption.',
+      headline: 'Cybersecurity Investments Soar: Critical Infrastructure Under Siege',
+      summary: 'Government and enterprise spending on cyber defense exceeds $2.4B. Geopolitical cyber threats creating urgent demand for AI-driven security.',
       imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=300&fit=crop',
     },
     {
-      headline: 'Cloud Infrastructure Costs Optimization Becomes Priority',
-      summary: 'Engineering teams report 35% efficiency gains through workload optimization. FinOps becoming critical skill.',
+      headline: 'Supply Chain Mapping AI Becomes Essential Business Tool',
+      summary: 'Enterprises deploying AI to identify dependencies and risks. Companies offering supply chain visibility raising $1.8B in Series funding.',
       imageUrl: 'https://images.unsplash.com/photo-1667372335033-c42b63f543f4?w=400&h=300&fit=crop',
     },
     {
-      headline: 'API Economy Matures with Security Standards',
-      summary: 'New API governance frameworks standardize authentication and rate limiting. Security-first approach becoming industry norm.',
+      headline: 'Geopolitical Intelligence Platforms Revolutionize Risk Analytics',
+      summary: 'Real-time monitoring of geopolitical events becoming standard. APIs providing trade flow, sanctions, and shipping data attracting enterprise interest.',
       imageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324ef6db?w=400&h=300&fit=crop',
     },
   ],
@@ -431,6 +445,13 @@ export const getMockStoryArc = (topic: string): any => {
       {
         date: 'May 2025',
         event: 'Industry standardization',
+        sentiment: 0.75,
+        price: 850,
+        details: 'Industry groups establish best practices',
+      },
+      {
+        date: 'March 2026',
+        event: 'LPG Gas Shortage',
         sentiment: 0.75,
         price: 850,
         details: 'Industry groups establish best practices',
