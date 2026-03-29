@@ -1,43 +1,49 @@
 import { ai, withRetry, Type } from "./BaseAgent";
+import firebaseAI from "../utils/firebaseAI";
+import { getMockStoryArc } from "../utils/mockData";
 
 export const generateStoryArc = async (topic: string) => {
-  const response = await withRetry((model) => ai.models.generateContent({
-    model,
-    contents: `Analyze the business story arc for: ${topic}. 
-    Provide a detailed timeline of events, key players, and future predictions.
-    For each timeline event, provide a simulated stock price or valuation index (0-1000) that reflects the market impact of that event.`,
-    config: { 
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          title: { type: Type.STRING, description: "The title of the story arc" },
-          timeline: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                date: { type: Type.STRING, description: "The date of the event (e.g. Jan 2024)" },
-                event: { type: Type.STRING, description: "Short description of what happened" },
-                sentiment: { type: Type.NUMBER, description: "Sentiment score from -1 to 1" },
-                price: { type: Type.NUMBER, description: "Simulated stock price or valuation index (0-1000)" }
-              },
-              required: ["date", "event", "sentiment", "price"]
-            }
-          },
-          keyPlayers: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING }
-          },
-          predictions: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING }
-          }
-        },
-        required: ["title", "timeline", "keyPlayers", "predictions"]
-      }
-    },
-  }));
+  const prompt = `Analyze the business story arc for: ${topic}. 
+  Provide a detailed timeline of events, key players, and future predictions.
+  For each timeline event, provide a simulated stock price or valuation index (0-1000) that reflects the market impact of that event.
+  Format the output as JSON: { "title": "...", "timeline": [...], "keyPlayers": [...], "predictions": [...] }`;
 
-  return JSON.parse(response.text);
+  try {
+    // Use client-side Firebase AI first (distributed quota)
+    const result = await firebaseAI.generateText(prompt, false); // Flash model only
+    
+    try {
+      const parsed = firebaseAI.parseJsonResponse(result);
+      // Ensure keyPlayers is always an array of strings
+      if (parsed.keyPlayers) {
+        parsed.keyPlayers = parsed.keyPlayers.map((player: any) => 
+          typeof player === 'string' ? player : (player.name || JSON.stringify(player))
+        );
+      }
+      // Ensure predictions is always an array of strings
+      if (parsed.predictions) {
+        parsed.predictions = parsed.predictions.map((pred: any) => 
+          typeof pred === 'string' ? pred : JSON.stringify(pred)
+        );
+      }
+      return parsed;
+    } catch {
+      // Parse error, return structured response
+      return {
+        title: topic,
+        timeline: [],
+        keyPlayers: [],
+        predictions: [result]
+      };
+    }
+  } catch (error) {
+    console.warn('Story arc generation failed, using mock data:', error);
+    
+    // Use mock story arc as graceful fallback
+    const mockArc = getMockStoryArc(topic);
+    return {
+      ...mockArc,
+      _isMockData: true
+    };
+  }
 };
